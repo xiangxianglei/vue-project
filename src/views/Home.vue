@@ -27,15 +27,24 @@ export default {
   data() {
     return {
       active: 0
-    }
+    };
   },
-  methods:{
-    router(val){
-      window.console.log(val)
-      this.$router.push(val)
+  methods: {
+    router(val) {
+      window.console.log(val);
+      this.$router.push(val);
     },
-    count(){
-      this.$store.commit('increment',999)
+    count() {
+      this.$store.commit("increment", 999);
+      this.$get("/Wap/Test/gettest", {
+        id: "666"
+      })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(err => {
+        console.log(err);
+      });
     }
   }
 };
