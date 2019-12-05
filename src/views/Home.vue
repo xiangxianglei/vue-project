@@ -36,6 +36,10 @@ export default {
     },
     count(){
       this.$store.commit('increment',999)
+      this.$get('/Wap/Test/gettest')
+      .then((response) => {
+        console.log(response)
+      })
     }
   }
 };
