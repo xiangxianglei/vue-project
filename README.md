@@ -1,5 +1,5 @@
 # vue-cli-project
-liuxiang
+AdolphLx
 ## Project setup
 ```
 npm install
