@@ -42,6 +42,7 @@ router.beforeEach((from, to, next) => {
     next() //新增这一句
   }else{
     next('/login')
+    console.log(6666)
   }
 })
 export default router

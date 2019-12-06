@@ -25,10 +25,39 @@ export default {
       password: ""
     };
   },
+  mounted() {
+    this.$store.commit("increment", 1);
+  },
   methods: {
-    handleChange () {
-      window.localStorage.setItem('token', this.username);
-        this.$router.go(-1)
+    handleChange() {
+      let that = this;
+      that.$toast.loading({
+        message: '登录中...',
+        forbidClick: true,
+        loadingType: 'spinner'
+      });
+      let username = that.username;
+      let password = that.password;
+      if(username=="" || password==""){
+        that.$toast("用户名或密码有误！")
+        return
+      }
+      that.$get("/Wap/Test/gettest", {
+          username: username,
+          password: password
+        })
+        .then(response => {
+          console.log(response);
+          window.localStorage.setItem("token", response.data.username);
+          that.$toast.success("登录成功");
+          setTimeout(function() {
+            that.$store.commit("increment", 1);
+            that.$router.go(-1);
+          }, 1000);
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }
 };
