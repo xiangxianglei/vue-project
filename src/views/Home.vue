@@ -11,7 +11,7 @@
       <van-tabbar-item icon="friends-o" @click="router('/my')">标签</van-tabbar-item>
       <van-tabbar-item icon="setting-o" @click="router('/login')">标签</van-tabbar-item>
     </van-tabbar>
-    <button @click="count">5555</button>
+    <button @click="count" class="btn">5555</button>
   </div>
 </template>
 
@@ -49,3 +49,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+    .btn{
+      width: 7.5rem;
+      height: 2rem;
+    }
+</style>
