@@ -1,12 +1,7 @@
 <template>
   <div id="app">
     <router-view/>
-    <van-tabbar v-model="active" v-if="$store.state.count=='0'">
-      <van-tabbar-item icon="home-o" @click="router('/')">标签</van-tabbar-item>
-      <van-tabbar-item icon="search" @click="router('/About')">标签</van-tabbar-item>
-      <van-tabbar-item icon="friends-o" @click="router('/my')">标签</van-tabbar-item>
-      <van-tabbar-item icon="setting-o" @click="router('/login')">标签</van-tabbar-item>
-    </van-tabbar>
+   
   </div>
 </template>
 <script>
