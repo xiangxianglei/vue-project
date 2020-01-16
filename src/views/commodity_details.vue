@@ -1,5 +1,6 @@
 <template>
   <div class="commodity_details">
+    <div class="nav_bar_h"></div>
     <van-nav-bar title="商品详情" left-text="返回" left-arrow @click-left="onClickLeft" />
 
     <van-image-preview v-model="show" :images="images" @change="onChange" :startPosition="index">
@@ -13,6 +14,25 @@
       </van-swipe-item>
     </van-swipe>
 
+    <div class="details_title">
+      <div class="details_h">Apple/苹果iPhone 8 128G 玫瑰金 移动联通电信全网通手机</div>
+      <div class="details_title_s">
+        <div class="details_title_p">
+          {{ imputed_price_s(imputed_price) }}
+          <span :hidden="time_time">999</span>
+        </div>
+        <div class="details_title_time" :hidden="time_time">
+          <span>优惠倒计时</span>
+          <van-count-down :time="time" @finish="finish">
+            <template v-slot="timeData">
+              <span class="item">{{ timeData_s(timeData.hours) }}</span>
+              <span class="item">{{ timeData_s(timeData.minutes) }}</span>
+              <span class="item">{{ timeData_s(timeData.seconds) }}</span>
+            </template>
+          </van-count-down>
+        </div>
+      </div>
+    </div>
     <!-- 优惠券单元格 -->
     <van-coupon-cell :coupons="coupons" :chosen-coupon="chosenCoupon" @click="showList = true" />
 
@@ -26,6 +46,11 @@
         @exchange="onExchange_yhj"
       />
     </van-popup>
+
+    <van-cell title="选择" is-link :value="item_list" @click="Choose_specifications" />
+
+    <!-- 分割线 -->
+    <van-divider :style="{ color: '#333', borderColor: '#333', padding: '0 16px' }">宝贝详情</van-divider>
 
     <div class="imageList_s">
       <img v-for="img in imageList_s" v-lazy="img" />
@@ -41,15 +66,18 @@
         :initial-sku="initialSku"
         @buy-clicked="onBuyClicked"
         @add-cart="onAddCartClicked"
+        @sku-selected="selected_sku"
+        @stepper-change="stepper_change"
+        ref="getSku"
       />
     </div>
 
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" />
-      <van-goods-action-icon icon="cart-o" text="购物车" :info="cart_info" />
+      <van-goods-action-icon icon="cart-o" text="购物车" :info="cart_info" @click="router('/cart')" />
       <!-- <van-goods-action-icon icon="shop-o" text="店铺" info="12" /> -->
-      <van-goods-action-button type="warning" text="加入购物车" />
-      <van-goods-action-button type="danger" text="立即购买" />
+      <van-goods-action-button type="warning" text="加入购物车" @click="onAddCartClicked" />
+      <van-goods-action-button type="danger" text="立即购买" @click="onBuyClicked" />
     </van-goods-action>
   </div>
 </template>
@@ -69,6 +97,10 @@ const coupon = {
 export default {
   data() {
     return {
+      time_time:false,
+      time: 100000,
+      timeData: {},
+      loading: true,
       show: false,
       index: 0,
       images: [
@@ -169,7 +201,7 @@ export default {
         // 商品标题
         title: "测试商品",
         // 默认商品 sku 缩略图
-        picture: "https://img.yzcdn.cn/vant/apple-1.jpg"
+        picture: "https://img.yzcdn.cn/vant/apple-2.jpg"
       },
       //初始选择项
       initialSku: {
@@ -223,12 +255,18 @@ export default {
           unitDesc: "元",
           reason: "不可用原因"
         }
-      ]
+      ],
+      skuValue_list: [],
+      item_list: "请选择规格",
+      imputed_price:"9999",
+      valueDesc_price:"0"
     };
   },
   mounted() {
-    let id = this.$route.params.id;
-    this.goodsId = id;
+    let that = this;
+    let id = that.$route.params.id;
+    that.goodsId = id;
+    that.getSkuData_s();
   },
   methods: {
     onClickLeft() {
@@ -245,27 +283,132 @@ export default {
       this.show = true;
     },
     // 立即购买事件
-    onBuyClicked() {},
+    onBuyClicked() {
+      let that = this;
+      if (that.item_list == "请选择规格") {
+        that.show_specification = true;
+        return false;
+      }
+      let getSkuData_list = that.$refs.getSku.getSkuData();
+      console.log(getSkuData_list);
+    },
     // 加入购物车事件
     onAddCartClicked(e) {
-      console.log(e);
-      this.show_specification = false;
-      this.cart_info += 1;
+      let that = this;
+      if (that.item_list == "请选择规格") {
+        that.show_specification = true;
+        return false;
+      }
+      let getSkuData_list = that.$refs.getSku.getSkuData();
+      that.show_specification = false;
+      that.cart_info += 1;
+      console.log(getSkuData_list);
     },
     //优惠券切换回调
     onChange_yhj(index) {
-      this.showList = false;
-      console.log(index)
-      if(index!=-1) {
-        this.chosenCoupon = index;
-        let id = this.coupons[index].id;
-        let type = this.coupons[index].type;
-        console.log("yhj_id", this.coupons[index].type);
+      let that=this
+      that.showList = false;
+      console.log(index);
+      if (index != -1) {
+        that.chosenCoupon = index;
+        let id = that.coupons[index].id;
+        let type = that.coupons[index].type;
+        that.valueDesc_price=that.coupons[index].value;
+        let getSkuData_list = that.$refs.getSku.getSkuData();
+        that.imputed_price=getSkuData_list.selectedSkuComb.price-that.valueDesc_price;
+        console.log("yhj_id", that.coupons[index]);
+      }else{
+        that.chosenCoupon = -1;
+        that.valueDesc_price=0;
+        let getSkuData_list = that.$refs.getSku.getSkuData();
+        that.imputed_price=getSkuData_list.selectedSkuComb.price-that.valueDesc_price;
       }
     },
     //兑换优惠券回调
     onExchange_yhj(code) {
       this.coupons.push(coupon);
+    },
+    selected_sku(e) {
+      let that = this;
+      that.getSkuData_s();
+    },
+    stepper_change(e) {
+      let that = this;
+      console.log(e);
+      that.getSkuData_s(e);
+    },
+    Choose_specifications() {
+      this.show_specification = true;
+    },
+    getSkuData_s(val) {
+      let that = this;
+      let item1;
+      let item2;
+      let item3;
+      let item_list;
+      let item_quantity;
+      let getSkuData_list = that.$refs.getSku.getSkuData();
+      if (val) {
+        item_quantity = val;
+      } else {
+        item_quantity = getSkuData_list.selectedNum;
+      }
+      console.log(getSkuData_list);
+      if (getSkuData_list.selectedSkuComb) {
+        if (getSkuData_list.selectedSkuComb.s1) {
+          let items = that.sku.tree[0].v.find(item => {
+            return item.id == getSkuData_list.selectedSkuComb.s1;
+          });
+          item1 = items.name;
+        }
+        if (getSkuData_list.selectedSkuComb.s2) {
+          let items = that.sku.tree[1].v.find(item => {
+            return item.id == getSkuData_list.selectedSkuComb.s2;
+          });
+          item2 = items.name;
+        }
+        if (getSkuData_list.selectedSkuComb.s3) {
+          let items = that.sku.tree[2].v.find(item => {
+            return item.id == getSkuData_list.selectedSkuComb.s3;
+          });
+          item3 = items.name;
+        }
+        if (item1) {
+          item_list = item1 + ",数量" + item_quantity;
+        }
+        if (item2) {
+          item_list = item1 + "," + item2 + ",数量" + item_quantity;
+        }
+        if (item3) {
+          item_list =
+            item1 + "," + item2 + "," + item3 + ",数量" + item_quantity;
+        }
+
+        that.imputed_price=getSkuData_list.selectedSkuComb.price-that.valueDesc_price;
+        console.log(item_list);
+        that.item_list = item_list;
+      }
+    },
+    router(val) {
+      window.console.log(val);
+      this.$router.push(val).catch(err => {
+        console.log(err);
+      });
+    },
+    timeData_s(val) {
+      let times = val;
+      if (times <= 9) {
+        times = "0" + times;
+      }
+      return times;
+    },
+    imputed_price_s(val){
+      let price_s="￥"+val/100
+      return price_s
+    },
+    finish() {
+      this.$toast('活动已结束');
+      this.time_time=true;
     }
   }
 };
@@ -275,6 +418,7 @@ export default {
 .home_lb img {
   width: 7.5rem;
   height: 7.5rem;
+  float: left;
 }
 .specification {
   text-align: left;
@@ -290,5 +434,53 @@ export default {
 .imageList_s img {
   width: 100%;
 }
-
+.item {
+  display: inline-block;
+  width: 22px;
+  margin-right: 5px;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  background-color: #000;
+}
+.details_title {
+  padding: 0 0.2rem 0.2rem;
+  background: #ff6034;
+  padding-top: 0.1rem;
+}
+.details_h {
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  text-align: left;
+}
+.details_title_s {
+  width: 100%;
+  margin-top: 0.1rem;
+}
+.details_title_s:after {
+	content: "200b";
+	display: block;
+	font-size: 0;
+	height: 0;
+	clear: both
+}
+.details_title_p {
+  float: left;
+  color: #fff;
+  font-size: 0.4rem;
+  line-height: 0.8rem;
+}
+.details_title_p span {
+  font-size: 0.3rem;
+  text-decoration: line-through;
+  color: #eee;
+}
+.details_title_time {
+  float: right;
+}
+.details_title_time span {
+  font-size: 0.28rem;
+  color: #fff;
+}
 </style>>

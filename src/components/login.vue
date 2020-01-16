@@ -67,11 +67,13 @@ export default {
         .then(response => {
           console.log(response);
           window.localStorage.setItem("token", response.data.username);
+          let logoin_time = new Date().getTime();
+          window.localStorage.setItem("logoin_time", logoin_time);
           setTimeout(function() {
             that.$toast.success("登录成功");
             setTimeout(() => {
               clearInterval(times);
-               that.$router.go(-1);
+              that.$router.go(-1);
             }, 1000);
           }, 1000);
         })
@@ -86,7 +88,7 @@ export default {
       if (username == "") {
         that.$toast("请输入手机号！");
         return;
-      } 
+      }
       times = setInterval(() => {
         code--;
         that.code_text = code + "s";
@@ -135,10 +137,20 @@ export default {
   font-size: 0.5rem;
   color: #7c817d;
 }
-.van-cell__title{
+.van-cell__title {
   text-align: left;
 }
-.van-checkbox{
-  margin-left: 0.2rem
+.van-checkbox {
+  margin-left: 0.2rem;
+}
+#app .van-nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.nav_bar_h {
+  width: 100%;
+  height: 46px;
 }
 </style>

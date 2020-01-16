@@ -27,7 +27,7 @@
       mode="closeable"
     >16:00前下单当天发货，默认快递：中通。需要发指定快递请联系客服更改。</van-notice-bar>
     <!-- 分割线 -->
-    <van-divider :style="{ color: '#333', borderColor: '#333', padding: '0 16px' }">拼着买更划算</van-divider>
+    <van-divider :style="{ color: '#333', borderColor: '#333', padding: '0 16px' }">热门商品</van-divider>
     <!-- 筛选器 -->
     <van-dropdown-menu>
       <van-dropdown-item v-model="value1" :options="option1" @change="option_a" />
@@ -83,7 +83,7 @@ export default {
       value1: 0,
       value2: "a",
       option1: [
-        { text: "全部商品", value: 0 },
+        { text: "热门商品", value: 0 },
         { text: "新款商品", value: 1 },
         { text: "活动商品", value: 2 }
       ],
@@ -105,6 +105,7 @@ export default {
         that.scrollTop_s = "";
       }
     });
+    window.scrollTo(0,0);  
   },
   methods: {
     count() {

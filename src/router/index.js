@@ -64,6 +64,13 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((from, to, next) => {
+  let that=this
+  let logoin_time =window.localStorage.getItem('logoin_time');
+  let present_time=new Date().getTime();
+  console.log(present_time-logoin_time)
+  if(present_time-logoin_time>10000000){
+    window.localStorage.clear();
+  }
   let token =window.localStorage.getItem('token');
   window.console.log(token)
   if(token){ //如果已经登录，则直接跳转
