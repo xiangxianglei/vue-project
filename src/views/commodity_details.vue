@@ -53,7 +53,7 @@
     <van-divider :style="{ color: '#333', borderColor: '#333', padding: '0 16px' }">宝贝详情</van-divider>
 
     <div class="imageList_s">
-      <img v-for="img in imageList_s" v-lazy="img" />
+      <img v-for="img in imageList_s" v-lazy="img"/>
     </div>
 
     <!-- 商品规格选择 -->
